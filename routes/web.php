@@ -14,6 +14,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::middleware(['auth','check_role:admin'])->group(function () {
 
         Route::get('/profile', [UserController::class, 'index'])->name('profile');
+        Route::post('/profile', [UserController::class, 'update'])->name('profile.update');
     // Rute untuk menampilkan halaman utama (daftar barang)
         Route::get('/data-barang', [BarangController::class, 'index'])->name('data-barang');
 

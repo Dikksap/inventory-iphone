@@ -62,6 +62,16 @@
                     >
                 </div>
 
+                <!-- Kategori -->
+                <div>
+                    <label for="kategori_id" class="block text-sm font-medium text-gray-700">Kategori:</label>
+                    <select name="kategori_id" required>
+                        @foreach ($kategoris as $kategori)
+                            <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <!-- Gambar -->
                 <div x-data="{ preview: null }" class="mt-6">
                     <label for="gambar" class="block text-sm font-medium text-gray-700">Upload Gambar:</label>
@@ -86,11 +96,6 @@
                         <img :src="preview" alt="Preview Gambar" class="w-48 h-48 object-cover rounded-md mx-auto">
                     </div>
                 </div>
-                <select name="kategori_id" required>
-                    @foreach ($kategoris as $kategori)
-                        <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
-                    @endforeach
-                </select>
 
                 <!-- Tombol Submit -->
                 <div>

@@ -11,13 +11,11 @@
                 <div class="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition duration-300">
                     <h2 class="text-lg font-semibold text-gray-600">Pendapatan Bulan Ini</h2>
                     <p class="text-2xl font-bold text-green-500 mt-2">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
-
                 </div>
                 <!-- Keuntungan Tahun Ini -->
                 <div class="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition duration-300">
                     <h2 class="text-lg font-semibold text-gray-600">Keuntungan Bulan Ini</h2>
                     <p class="text-2xl font-bold text-blue-500 mt-2">Rp {{ number_format($totalKeuntungan, 0, ',', '.') }}</p>
-
                 </div>
                 <!-- Barang Terjual Tahun Ini -->
                 <div class="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition duration-300">
@@ -66,7 +64,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Chart.js -->
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
