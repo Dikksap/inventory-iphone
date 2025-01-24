@@ -27,9 +27,7 @@ class BarangFactory extends Factory
 
         return [
             'nama_barang' => $this->faker->word(),  // Nama barang acak
-            'harga_barang' => $this->faker->randomFloat(2, 100000, 1000000),  // Harga barang acak
             'harga_beli' => $this->faker->randomFloat(2, 50000, 800000),  // Harga beli acak
-            'harga_jual' => $this->faker->randomFloat(2, 80000, 1200000),  // Harga jual acak
             'harga_terjual' => $this->faker->optional()->randomFloat(2, 80000, 1200000),  // Harga terjual acak (nullable)
             'kontak_pembeli' => $this->faker->optional()->phoneNumber(),  // Kontak pembeli acak (nullable)
             'terjual' => $this->faker->boolean(),  // Status terjual (true/false)

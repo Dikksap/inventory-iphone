@@ -4,9 +4,44 @@
         <h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">Tambah Barang</h1>
 
         <!-- Form untuk menambah barang -->
-        <form action="{{ route('barang.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
+        <form action="{{ route('barang.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off" onsubmit="sanitizeHargaBeli()">
             @csrf
             <div class="space-y-6">
+                <div class="flex flex-col space-y-4">
+                    <div class="flex justify-between space-x-4">
+                        <!-- Kategori -->
+                        <div class="w-1/3">
+                            <label for="kategori_id" class="block text-sm font-medium text-gray-700">Kategori:</label>
+                            <select name="kategori_id" id="kategori_id" required onchange="updateNamaBarang()" class="w-full p-2 border border-gray-300 rounded-md">
+                                @foreach ($kategoris as $kategori)
+                                    <option value="{{ $kategori->id }}" data-nama="{{ $kategori->nama_kategori }}">{{ $kategori->nama_kategori }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Penyimpanan -->
+                        <div class="w-1/3">
+                            <label for="penyimpanan" class="block text-sm font-medium text-gray-700">Penyimpanan:</label>
+                            <select name="penyimpanan" id="penyimpanan" required onchange="updateNamaBarang()" class="w-full p-2 border border-gray-300 rounded-md">
+                                <option value="64GB">64GB</option>
+                                <option value="128GB">128GB</option>
+                                <option value="256GB">256GB</option>
+                            </select>
+                        </div>
+
+                        <!-- Jenis -->
+                        <div class="w-1/3">
+                            <label for="jenis" class="block text-sm font-medium text-gray-700">Jenis:</label>
+                            <select name="jenis" id="jenis" required onchange="updateNamaBarang()" class="w-full p-2 border border-gray-300 rounded-md">
+                                <option value="Ibox">Ibox</option>
+                                <option value="Inter">Inter</option>
+                                <option value="Beacukai">Beacukai</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
                 <!-- Nama Barang -->
                 <div>
                     <label for="nama_barang" class="block text-sm font-medium text-gray-700">Nama Barang:</label>
@@ -20,56 +55,28 @@
                     >
                 </div>
 
-                <!-- Harga Barang -->
-                <div>
-                    <label for="harga_barang" class="block text-sm font-medium text-gray-700">Harga Barang:</label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        name="harga_barang"
-                        id="harga_barang"
-                        value="{{ old('harga_barang') }}"
-                        required
-                        class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    >
-                </div>
-
                 <!-- Harga Beli -->
                 <div>
                     <label for="harga_beli" class="block text-sm font-medium text-gray-700">Harga Beli:</label>
                     <input
-                        type="number"
-                        step="0.01"
+                        type="text"
                         name="harga_beli"
                         id="harga_beli"
                         value="{{ old('harga_beli') }}"
                         required
+                        oninput="formatHargaBeli(event)"
                         class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                     >
                 </div>
 
-                <!-- Harga Jual -->
+                <!-- Deskripsi -->
                 <div>
-                    <label for="harga_jual" class="block text-sm font-medium text-gray-700">Harga Jual:</label>
-                    <input
-                        type="number"
-                        step="0.01"
-                        name="harga_jual"
-                        id="harga_jual"
-                        value="{{ old('harga_jual') }}"
-                        required
+                    <label for="deskripsi" class="block text-sm font-medium text-gray-700">Deskripsi:</label>
+                    <textarea
+                        name="deskripsi"
+                        id="deskripsi"
                         class="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                    >
-                </div>
-
-                <!-- Kategori -->
-                <div>
-                    <label for="kategori_id" class="block text-sm font-medium text-gray-700">Kategori:</label>
-                    <select name="kategori_id" required>
-                        @foreach ($kategoris as $kategori)
-                            <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
-                        @endforeach
-                    </select>
+                    >{{ old('deskripsi') }}</textarea>
                 </div>
 
                 <!-- Gambar -->
@@ -120,5 +127,36 @@
         </div>
         @endif
     </div>
+
+    <script>
+        function updateNamaBarang() {
+            const kategoriSelect = document.getElementById('kategori_id');
+            const penyimpananSelect = document.getElementById('penyimpanan');
+            const jenisSelect = document.getElementById('jenis');
+
+            const kategori = kategoriSelect.options[kategoriSelect.selectedIndex].getAttribute('data-nama');
+            const penyimpanan = penyimpananSelect.value;
+            const jenis = jenisSelect.value;
+
+            // Update input nama_barang dengan kombinasi kategori, penyimpanan, dan jenis
+            document.getElementById('nama_barang').value = `${kategori} ${penyimpanan} ${jenis}`;
+        }
+
+        // Format harga beli dengan titik setiap 3 digit
+        function formatHargaBeli(event) {
+            let value = event.target.value;
+            // Hapus semua karakter yang bukan angka
+            value = value.replace(/\D/g, '');
+            // Format angka dengan titik setiap 3 digit
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            event.target.value = value;
+        }
+
+        // Menghapus titik saat mengirimkan data
+        function sanitizeHargaBeli() {
+            const hargaBeliInput = document.getElementById('harga_beli');
+            hargaBeliInput.value = hargaBeliInput.value.replace(/\./g, ''); // Menghapus titik
+        }
+    </script>
     @endsection
 </x-layouts.index>

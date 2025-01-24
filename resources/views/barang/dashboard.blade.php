@@ -7,17 +7,17 @@
 
             <!-- Statistik Bulanan -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Pendapatan Tahun Ini -->
+                <!-- Pendapatan Bulan Ini -->
                 <div class="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition duration-300">
                     <h2 class="text-lg font-semibold text-gray-600">Pendapatan Bulan Ini</h2>
                     <p class="text-2xl font-bold text-green-500 mt-2">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
                 </div>
-                <!-- Keuntungan Tahun Ini -->
+                <!-- Keuntungan Bulan Ini -->
                 <div class="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition duration-300">
                     <h2 class="text-lg font-semibold text-gray-600">Keuntungan Bulan Ini</h2>
                     <p class="text-2xl font-bold text-blue-500 mt-2">Rp {{ number_format($totalKeuntungan, 0, ',', '.') }}</p>
                 </div>
-                <!-- Barang Terjual Tahun Ini -->
+                <!-- Barang Terjual Bulan Ini -->
                 <div class="p-6 bg-white shadow-lg rounded-lg hover:shadow-xl transition duration-300">
                     <h2 class="text-lg font-semibold text-gray-600">Barang Terjual Bulan Ini</h2>
                     <p class="text-2xl font-bold text-purple-500 mt-2">{{ $barangTerjual }}</p>
@@ -97,9 +97,8 @@
                             x: {
                                 ticks: {
                                     callback: function(value) {
-                                        // Menampilkan nama bulan
                                         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                                        return months[value];  // Mengubah angka bulan menjadi nama bulan
+                                        return months[value];  // Display month names instead of numbers
                                     }
                                 }
                             },

@@ -35,9 +35,13 @@
             <i class="fas fa-tablet-alt mr-3"></i>
             Keuangan
         </a>
-        <a href="calendar.html" class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 nav-item">
+        <a href="" class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 nav-item">
             <i class="fas fa-calendar mr-3"></i>
             Calendar
+        </a>
+        <a href="" class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 nav-item">
+            <i class="fas fa-user mr-3"></i>
+            Anggota
         </a>
         <a href="{{ route('profile') }}" class="flex items-center text-white opacity-75 hover:opacity-100 py-2 pl-4 nav-item">
             <i class="fas fa-user mr-3"></i>

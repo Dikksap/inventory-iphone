@@ -12,12 +12,11 @@ class Barang extends Model
     // Tentukan kolom yang bisa diisi massal
     protected $fillable = [
         'nama_barang',
-        'harga_barang',
         'harga_beli',
-        'harga_jual',
         'harga_terjual',
         'kontak_pembeli',
         'terjual',
+        'deskripsi', // Tambahkan deskripsi ke fillable
         'gambar',
         'kategori_id', // Tambahkan kategori_id ke fillable
     ];

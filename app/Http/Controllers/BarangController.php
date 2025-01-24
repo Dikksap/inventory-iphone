@@ -15,19 +15,20 @@ class BarangController extends Controller
         // Cache query berdasarkan parameter filter
         $cacheKey = 'barang_' . md5(json_encode($request->all()));
         $barangs = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($request) {
-            $query = Barang::select([
-                'id',
-                'nama_barang',
-                'harga_barang',
-                'harga_beli',
-                'harga_jual',
-                'harga_terjual',
-                'kontak_pembeli',
-                'terjual',
-                'gambar',
-                'created_at',
-                DB::raw('harga_terjual - harga_beli AS keuntungan')
-            ])->orderBy('id', 'desc');
+            $query = Barang::with('kategori') // Eager load kategori
+                ->select([
+                    'id',
+                    'nama_barang',
+                    'harga_beli',
+                    'harga_terjual',
+                    'kontak_pembeli',
+                    'terjual',
+                    'gambar',
+                    'deskripsi', // Added deskripsi
+                    'created_at',
+                    DB::raw('harga_terjual - harga_beli AS keuntungan')
+                ])
+                ->orderBy('id', 'desc');
 
             // Filter berdasarkan nama_barang
             if ($request->filled('nama_barang')) {
@@ -47,7 +48,7 @@ class BarangController extends Controller
 
     public function create()
     {
-        // Ambil semua kategori dari database
+        // Ambil semua kategori dari database dengan eager loading
         $kategoris = Kategori::all();
 
         return view('barang.create', compact('kategoris'));
@@ -57,20 +58,22 @@ class BarangController extends Controller
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'harga_barang' => 'required|numeric',
             'harga_beli' => 'required|numeric',
-            'harga_jual' => 'required|numeric',
+            'harga_terjual' => 'nullable|numeric',
             'kategori_id' => 'required|exists:kategori,id', // Validasi kategori_id
+            'penyimpanan' => 'required|string', // Added validation for penyimpanan
+            'jenis' => 'required|string', // Added validation for jenis
+            'deskripsi' => 'nullable|string', // Added validation for deskripsi
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
         $barang = new Barang();
         $barang->fill($request->only([
             'nama_barang',
-            'harga_barang',
             'harga_beli',
-            'harga_jual',
+            'harga_terjual',
             'kategori_id', // Tambahkan kategori_id
+            'deskripsi', // Added deskripsi
         ]));
 
         if ($request->hasFile('gambar')) {
@@ -87,7 +90,8 @@ class BarangController extends Controller
 
     public function show($id)
     {
-        $barang = Barang::findOrFail($id);
+        // Eager load kategori for the barang
+        $barang = Barang::with('kategori')->findOrFail($id);
 
         return view('barang.show', [
             'barang' => $barang,
@@ -100,18 +104,19 @@ class BarangController extends Controller
         $bulan = $request->input('bulan') ?? date('m');
         $tahun = $request->input('tahun') ?? date('Y');
 
-        // Query data barang terjual
-        $laporan = Barang::where('terjual', true)
+        // Query data barang terjual with eager loading
+        $laporan = Barang::with('kategori') // Eager load kategori
+            ->where('terjual', true)
             ->whereMonth('created_at', $bulan)
             ->whereYear('created_at', $tahun)
             ->select([
                 'id',
                 'nama_barang',
                 'harga_beli',
-                'harga_jual',
                 'harga_terjual',
                 DB::raw('harga_terjual - harga_beli AS keuntungan'),
-            ])->get();
+            ])
+            ->get();
 
         // Hitung total pendapatan dan keuntungan
         $totalKeuntungan = $laporan->sum('keuntungan');
@@ -126,7 +131,8 @@ class BarangController extends Controller
         $tahun = $request->input('tahun', date('Y')); // Pendapatan tahun ini
 
         // Ambil data pendapatan dan keuntungan untuk bulan ini
-        $laporanBulanIni = Barang::where('terjual', true)
+        $laporanBulanIni = Barang::with('kategori') // Eager load kategori
+            ->where('terjual', true)
             ->whereMonth('created_at', $bulan)
             ->whereYear('created_at', $tahun)
             ->select([
@@ -143,7 +149,8 @@ class BarangController extends Controller
         $barangTerjual = $laporanBulanIni->count();
 
         // Ambil data pendapatan dan keuntungan untuk seluruh bulan tahun ini (grafik tahunan)
-        $laporanTahunIni = Barang::where('terjual', true)
+        $laporanTahunIni = Barang::with('kategori') // Eager load kategori
+            ->where('terjual', true)
             ->whereYear('created_at', $tahun)
             ->select([
                 DB::raw("DATE_FORMAT(created_at, '%m') as bulan"),
@@ -189,7 +196,7 @@ class BarangController extends Controller
 
     public function edit($id)
     {
-        $barang = Barang::findOrFail($id);
+        $barang = Barang::with('kategori')->findOrFail($id); // Eager load kategori
         $kategoris = Kategori::all(); // Ambil semua kategori
         return view('barang.edit', compact('barang', 'kategoris'));
     }
@@ -199,11 +206,11 @@ class BarangController extends Controller
         // Validasi input
         $request->validate([
             'nama_barang' => 'required|string|max:255',
-            'harga_barang' => 'required|numeric',
             'harga_beli' => 'required|numeric',
-            'harga_jual' => 'required|numeric',
             'harga_terjual' => 'nullable|numeric',
             'terjual' => 'required|boolean',
+            'kontak_pembeli' => 'nullable|string|max:50',
+            'deskripsi' => 'nullable|string', // Added validation for deskripsi
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
@@ -213,11 +220,11 @@ class BarangController extends Controller
         // Update atribut barang
         $barang->fill($request->only([
             'nama_barang',
-            'harga_barang',
             'harga_beli',
-            'harga_jual',
             'harga_terjual',
+            'kontak_pembeli',
             'terjual',
+            'deskripsi', // Added deskripsi
         ]));
 
         // Cek jika ada file gambar baru yang di-upload

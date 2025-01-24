@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'name' => 'Admin',
             'email' => 'admin@email.com',
-            'password' => Hash::make('admin'), // Ganti dengan kata sandi yang lebih aman
+            'password' => Hash::make('secure_password_123'), // Ganti dengan kata sandi yang lebih aman
             'role' => 'admin',
             'created_at' => now(),
             'updated_at' => now(),

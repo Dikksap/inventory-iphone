@@ -22,10 +22,9 @@
         >
             <a href="{{ route('profile') }}" class="block px-4 py-2 account-link hover:text-white">Account</a>
             <form action="{{ route('logout') }}" method="POST" class="block px-4 py-2 account-link hover:text-white">
-
                 @csrf
                 <button type="submit">Logout</button>
-        </form>
+            </form>
         </div>
     </div>
 </header>

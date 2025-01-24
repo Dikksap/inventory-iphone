@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('barangs', function (Blueprint $table) {
             $table->id();
             $table->string('nama_barang', 255);
-            $table->decimal('harga_barang', 10, 2);
             $table->decimal('harga_beli', 10, 2);
-            $table->decimal('harga_jual', 10, 2);
             $table->decimal('harga_terjual', 10, 2)->nullable();
             $table->string('kontak_pembeli', 50)->nullable();
             $table->boolean('terjual')->default(false);
             $table->string('gambar')->nullable();
             $table->unsignedBigInteger('kategori_id'); // Ensure this is unsignedBigInteger
+
+            // Add deskripsi column
+            $table->text('deskripsi')->nullable();
 
             // Foreign key definition
             $table->foreign('kategori_id')
@@ -31,7 +32,6 @@ return new class extends Migration
 
             $table->timestamps();
         });
-
     }
 
     /**
