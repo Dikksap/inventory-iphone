@@ -42,10 +42,9 @@
             <table class="min-w-full border-collapse border border-gray-200 text-sm sm:text-base">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">#</th>
+                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">No.</th>
                         <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Nama Barang</th>
                         <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Harga Beli</th>
-                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Harga Jual</th>
                         <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Harga Terjual</th>
                         <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Keuntungan</th>
                     </tr>
@@ -55,10 +54,9 @@
                         <tr class="hover:bg-gray-50">
                             <td class="border border-gray-200 px-4 py-2">{{ $loop->iteration }}</td>
                             <td class="border border-gray-200 px-4 py-2">{{ $item->nama_barang }}</td>
-                            <td class="border border-gray-200 px-4 py-2">{{ $item->harga_beli }}</td>
-                            <td class="border border-gray-200 px-4 py-2">{{ $item->harga_jual }}</td>
-                            <td class="border border-gray-200 px-4 py-2">{{ $item->harga_terjual }}</td>
-                            <td class="border border-gray-200 px-4 py-2">{{ $item->keuntungan }}</td>
+                            <td class="border border-gray-200 px-4 py-2">Rp {{ number_format($item->harga_beli, 0, ',', '.') }}</td>
+                            <td class="border border-gray-200 px-4 py-2">Rp {{ number_format($item->harga_terjual, 0, ',', '.') }}</td>
+                            <td class="border border-gray-200 px-4 py-2">Rp {{ number_format($item->keuntungan, 0, ',', '.') }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -78,5 +76,32 @@
             <p><strong>Total Pendapatan:</strong> Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
         </div>
     </div>
+    <script>
+     function exportToExcel() {
+    try {
+        // Menargetkan elemen tabel
+        const table = document.querySelector('table');
+
+        if (!table) {
+            alert('Tabel tidak ditemukan!');
+            return;
+        }
+
+        // Mengonversi tabel HTML menjadi sheet Excel
+        const ws = XLSX.utils.table_to_sheet(table);
+        const wb = XLSX.utils.book_new();
+
+        // Menambahkan sheet ke workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Laporan Keuangan');
+
+        // Menulis file Excel
+        XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
+    } catch (error) {
+        console.error('Gagal melakukan export:', error);
+        alert('Terjadi kesalahan saat melakukan export ke Excel.');
+    }
+}
+
+    </script>
     @endsection
 </x-layouts.index>

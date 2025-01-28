@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Iphone</title>
-    <meta name="author" content="David Grzyb">
     <meta name="description" content="">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,6 +18,8 @@
         .nav-item:hover { background: #1947ee; }
         .account-link:hover { background: #3d68ff; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 </head>
 <body class="bg-gray-100 font-family-karla flex">
 
@@ -42,39 +43,6 @@
         </div>
 
     </div>
-    <script>
-        function exportToExcel() {
-            // Menargetkan elemen tabel
-            const table = document.querySelector('table');
-
-            // Mengonversi tabel HTML menjadi sheet Excel
-            const ws = XLSX.utils.table_to_sheet(table);
-            const wb = XLSX.utils.book_new();
-
-            // Menambahkan sheet ke workbook
-            XLSX.utils.book_append_sheet(wb, ws, 'Laporan Keuangan');
-
-            // Format data untuk setiap sel di kolom tertentu (Harga Beli, Harga Jual, dll)
-            Object.keys(ws).forEach(cell => {
-                const col = cell.substring(0, 1); // Mengambil kolom dari referensi sel (misalnya A, B, C...)
-
-                // Kolom yang berisi angka yang ingin diformat (Harga Beli, Harga Jual, Harga Terjual, Keuntungan)
-                if (['C', 'D', 'E', 'F'].includes(col)) {
-                    // Ambil nilai dari sel
-                    let rawValue = ws[cell].v;
-
-                    // Jika nilai adalah angka, format untuk menghapus simbol dan koma serta pastikan hanya angka bulat
-                    if (typeof rawValue === 'number') {
-                        // Hapus koma dan pastikan angka tanpa desimal
-                        ws[cell].v = Math.floor(rawValue);
-                    }
-                }
-            });
-
-            // Menulis file Excel
-            XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
-        }
-    </script>
     <!-- AlpineJS -->
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 

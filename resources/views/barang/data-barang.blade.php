@@ -54,7 +54,7 @@
                     <tr class="hover:bg-grey-lighter">
                         <td class="py-4 px-6 border-b border-grey-light">{{ $barang->id }}</td>
                         <td class="py-4 px-6 border-b border-grey-light">{{ $barang->nama_barang }}</td>
-                        <td class="py-4 px-6 border-b border-grey-light">{{ number_format($barang->harga_beli, 2) }}</td>
+                        <td class="py-4 px-6 border-b border-grey-light">Rp. {{ number_format($barang->harga_beli, 2) }}</td>
                         <td class="py-4 px-6 border-b border-grey-light">
                             <span class="px-2 py-1 text-white rounded-full
                                 {{ $barang->terjual ? 'bg-green-500' : 'bg-red-500' }}">
