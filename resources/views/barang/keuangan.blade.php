@@ -1,107 +1,136 @@
 <x-layouts.index>
     @section('content')
-    <div class="container mx-auto py-6">
-        <h1 class="text-2xl font-bold mb-4 text-center sm:text-left">Laporan Keuangan</h1>
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Header -->
+        <div class="mb-8 text-center sm:text-left">
+            <h1 class="text-2xl font-bold text-gray-800 sm:text-3xl lg:text-4xl">Laporan Keuangan</h1>
+            <p class="mt-2 text-gray-600">Periode: {{ DateTime::createFromFormat('!m', $bulan)->format('F') }} {{ $tahun }}</p>
+        </div>
 
-        <!-- Filter -->
+        <!-- Filter Section -->
         <div x-data="{
-                bulan: '{{ request('bulan') ?? date('m') }}',
-                tahun: '{{ request('tahun') ?? date('Y') }}',
-                exportToExcel() {
-                    const table = document.querySelector('table');
-                    const ws = XLSX.utils.table_to_sheet(table);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, 'Laporan Keuangan');
-                    XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
+                bulan: '{{ $bulan }}',
+                tahun: '{{ $tahun }}',
+                loading: false,
+                async exportToExcel() {
+                    try {
+                        this.loading = true;
+                        const table = this.$refs.reportTable;
+                        const ws = XLSX.utils.table_to_sheet(table);
+                        const wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, 'Laporan Keuangan');
+                        XLSX.writeFile(wb, `Laporan-Keuangan-${this.bulan}-${this.tahun}.xlsx`);
+                    } catch (error) {
+                        alert('Error exporting: ' + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
                 }
-            }" class="mb-6 bg-white shadow-md rounded-lg p-4">
-            <!-- Filter Form -->
-            <form method="GET" action="{{ route('laporan.keuangan') }}" class="flex flex-wrap gap-4 items-center justify-center sm:justify-start">
-                <div class="w-full sm:w-auto">
-                    <label for="bulan" class="block text-sm font-medium text-gray-700">Bulan</label>
-                    <select name="bulan" id="bulan" x-model="bulan" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        @for ($i = 1; $i <= 12; $i++)
-                            <option value="{{ $i }}" :selected="bulan == '{{ $i }}'">{{ DateTime::createFromFormat('!m', $i)->format('F') }}</option>
-                        @endfor
+            }"
+            class="bg-gray-50 rounded-lg shadow-md p-4 mb-6 border border-gray-200">
+            <form method="GET" action="{{ route('laporan.keuangan') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                <!-- Bulan -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bulan</label>
+                    <select name="bulan" x-model="bulan" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        @foreach(range(1, 12) as $month)
+                        <option value="{{ $month }}" {{ $month == $bulan ? 'selected' : '' }}>
+                            {{ DateTime::createFromFormat('!m', $month)->format('F') }}
+                        </option>
+                        @endforeach
                     </select>
                 </div>
-                <div class="w-full sm:w-auto">
-                    <label for="tahun" class="block text-sm font-medium text-gray-700">Tahun</label>
-                    <input type="number" name="tahun" id="tahun" x-model="tahun" class="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+
+                <!-- Tahun -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tahun</label>
+                    <input type="number" name="tahun" x-model="tahun"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                           min="2000" max="2100" placeholder="Masukkan tahun">
                 </div>
-                <div class="mt-4 sm:mt-6">
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700">
+
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center transition">
                         Filter
+                    </button>
+                    <button @click.prevent="exportToExcel()" type="button"
+                            class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center justify-center transition"
+                            :disabled="loading">
+                        <span x-text="loading ? 'Mengekspor...' : 'Excel'"></span>
                     </button>
                 </div>
             </form>
         </div>
+<!-- Tabel Laporan -->
+<div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-sm md:text-base" x-ref="reportTable">
+            <thead class="bg-gray-50">
+                <tr class="border-b">
+                    <th class="px-4 py-3 text-center font-medium text-gray-500 uppercase text-xs md:text-sm lg:text-base border-r">
+                        No
+                    </th>
+                    <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase text-xs md:text-sm lg:text-base border-r">
+                        Nama Barang
+                    </th>
+                    <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase text-xs md:text-sm lg:text-base border-r">
+                        Harga Beli
+                    </th>
+                    <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase text-xs md:text-sm lg:text-base border-r">
+                        Harga Jual
+                    </th>
+                    <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase text-xs md:text-sm lg:text-base">
+                        Keuntungan
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                @forelse ($laporan as $item)
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-center text-gray-600 text-xs md:text-sm lg:text-base border-r">
+                        {{ $loop->iteration }}
+                    </td>
+                    <td class="px-4 py-3 text-gray-900 text-xs md:text-sm lg:text-base border-r">
+                        {{ $item->nama_barang }}
+                    </td>
+                    <td class="px-4 py-3 text-right text-gray-600 text-xs md:text-sm lg:text-base border-r">
+                        @currency($item->harga_beli)
+                    </td>
+                    <td class="px-4 py-3 text-right text-gray-600 text-xs md:text-sm lg:text-base border-r">
+                        @currency($item->harga_terjual)
+                    </td>
+                    <td class="px-4 py-3 text-right text-green-700 font-semibold text-xs md:text-sm lg:text-base">
+                        @currency($item->keuntungan)
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="p-6 text-center text-gray-500 text-xs md:text-sm lg:text-base">
+                        Tidak ada data untuk periode ini
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 
-        <!-- Tabel Laporan -->
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
-            <table class="min-w-full border-collapse border border-gray-200 text-sm sm:text-base">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">No.</th>
-                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Nama Barang</th>
-                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Harga Beli</th>
-                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Harga Terjual</th>
-                        <th class="border border-gray-200 px-4 py-2 text-left font-medium text-gray-700">Keuntungan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($laporan as $item)
-                        <tr class="hover:bg-gray-50">
-                            <td class="border border-gray-200 px-4 py-2">{{ $loop->iteration }}</td>
-                            <td class="border border-gray-200 px-4 py-2">{{ $item->nama_barang }}</td>
-                            <td class="border border-gray-200 px-4 py-2">Rp {{ number_format($item->harga_beli, 0, ',', '.') }}</td>
-                            <td class="border border-gray-200 px-4 py-2">Rp {{ number_format($item->harga_terjual, 0, ',', '.') }}</td>
-                            <td class="border border-gray-200 px-4 py-2">Rp {{ number_format($item->keuntungan, 0, ',', '.') }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <!-- Tombol untuk Export -->
-            <div class="p-4">
-                <button @click="exportToExcel()" class="px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700">
-                    Export ke Excel
-                </button>
+
+        <!-- Ringkasan -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold mb-4">Total Keuntungan</h3>
+                <div class="text-2xl font-bold text-green-700">@currency($totalKeuntungan)</div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold mb-4">Total Pendapatan</h3>
+                <div class="text-2xl font-bold text-blue-700">@currency($totalPendapatan)</div>
             </div>
         </div>
-
-        <!-- Ringkasan Keuangan -->
-        <div class="mt-6 bg-white shadow-md rounded-lg p-4">
-            <h4 class="text-lg font-semibold">Ringkasan Keuangan</h4>
-            <p><strong>Total Keuntungan:</strong> Rp {{ number_format($totalKeuntungan, 0, ',', '.') }}</p>
-            <p><strong>Total Pendapatan:</strong> Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
-        </div>
     </div>
-    <script>
-     function exportToExcel() {
-    try {
-        // Menargetkan elemen tabel
-        const table = document.querySelector('table');
 
-        if (!table) {
-            alert('Tabel tidak ditemukan!');
-            return;
-        }
-
-        // Mengonversi tabel HTML menjadi sheet Excel
-        const ws = XLSX.utils.table_to_sheet(table);
-        const wb = XLSX.utils.book_new();
-
-        // Menambahkan sheet ke workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Laporan Keuangan');
-
-        // Menulis file Excel
-        XLSX.writeFile(wb, 'laporan-keuangan.xlsx');
-    } catch (error) {
-        console.error('Gagal melakukan export:', error);
-        alert('Terjadi kesalahan saat melakukan export ke Excel.');
-    }
-}
-
-    </script>
+    <!-- Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     @endsection
 </x-layouts.index>
