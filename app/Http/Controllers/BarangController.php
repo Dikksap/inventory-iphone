@@ -43,7 +43,7 @@ class BarangController extends Controller
             return $query->paginate(10)->appends($request->query());
         });
 
-        return view('barang.data-barang', compact('barangs'));
+        return view('barang.data-barang', compact('barangs'))->with('success', $request->session()->get('success'));
     }
 
     public function create()

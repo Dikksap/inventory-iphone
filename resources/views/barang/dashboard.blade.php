@@ -77,9 +77,9 @@
             </div>
 
             <!-- Modal Trigger Button -->
-            <div classtext-center mb-8">
+            <div class="text-center mb-8">
                 <button @click="isModalOpen = true"
-                        class="btn-primary flex items-center justify-center gap-2 mx-auto">
+                        class="btn btn-text btn-success flex items-center justify-center gap-2 mx-auto">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -156,6 +156,7 @@
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const ctx = document.getElementById('chartPenjualanKeuntungan').getContext('2d');
+                    const currentMonth = new Date().getMonth();
 
                     new Chart(ctx, {
                         type: 'line',
@@ -212,7 +213,10 @@
                                     ticks: {
                                         callback: function(value) {
                                             return ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'][value];
-                                        }
+                                        },
+                                        maxTicksLimit: 12,
+                                        maxRotation: 0,
+                                        minRotation: 0
                                     }
                                 },
                                 y: {

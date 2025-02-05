@@ -12,25 +12,21 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // Validasi input
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Kredensial login
-        $credentials = $request->only('email', 'password');
+        // Add remember token capability
+        $remember = $request->has('remember');
 
-        // Cek kredensial
-        if (Auth::attempt($credentials)) {
-            // Regenerasi session
-            $request->session()->regenerate();
+        if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate(); // Regenerate session ID
 
-            // Redirect ke dashboard atau halaman lain
-            return redirect()->intended('dashboard')->with('success', 'Login berhasil!');
+            return redirect()->intended('dashboard')
+                   ->with('success', 'Login berhasil!');
         }
 
-        // Jika gagal login
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');

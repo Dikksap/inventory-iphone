@@ -26,18 +26,14 @@
  <x-navbar/>
 
     <!-- Main content area -->
-    <div class="relative w-full flex flex-col h-screen overflow-y-hidden">
-        <!-- Desktop Header -->
+    <div class="relative w-full flex flex-col h-screen overflow-y-hidden pb-8">
         <x-headers.desktop/>
-        <!-- Mobile Header & Nav -->
-        <x-headers.mobile/>
+        <x-headers.mobile class=" "/>
 
 
         <!-- Main Content -->
         <div class="w-full h-screen overflow-x-hidden border-t flex flex-col">
-            <main class="w-full flex-grow p-6">
-                <h1 class="text-3xl text-black pb-6">Web Inventory Iphone</h1>
-
+            <main class="w-full flex-grow p-0">
                 @yield('content') <!-- Konten dinamis dari halaman lain -->
             </main>
         </div>
